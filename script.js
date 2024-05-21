@@ -132,17 +132,26 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch("data.json")
             .then(response => response.json())
             .then(clothesData => {
-                const categories = new Set();
+                const categoryCount = {};
+    
                 clothesData.forEach(clothing => {
-                    clothing.categories.forEach(category => categories.add(category));
+                    clothing.categories.forEach(category => {
+                        if (categoryCount[category]) {
+                            categoryCount[category]++;
+                        } else {
+                            categoryCount[category] = 1;
+                        }
+                    });
                 });
-
-                const sortedCategories = Array.from(categories).sort();
-
+    
+                const sortedCategories = Object.keys(categoryCount).sort();
+    
                 const leftMenu = document.querySelector(".left-menu-inner");
+                leftMenu.innerHTML = "";
+    
                 sortedCategories.forEach(category => {
                     const button = document.createElement("button");
-                    button.innerText = category;
+                    button.innerText = `${category} (${categoryCount[category]})`;
                     button.addEventListener("click", function () {
                         document.querySelectorAll(".left-menu button").forEach(btn => btn.classList.remove("active"));
                         button.classList.add("active");
@@ -150,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
                     leftMenu.appendChild(button);
                 });
-
+    
                 const firstButton = leftMenu.querySelector("button");
                 if (firstButton) {
                     firstButton.classList.add("active");
